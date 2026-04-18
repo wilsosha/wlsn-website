@@ -197,18 +197,26 @@ Brief: ${desc}`;
 const FORMSPREE = 'https://formspree.io/f/xeevgyga';
 
 function Contact({ t }) {
-  const [slot, setSlot] = uS(null);
-  const [slotOk, setSlotOk] = uS(false);
-  const [slotSending, setSlotSending] = uS(false);
   const [form, setForm] = uS({name:'',email:'',company:'',budget:t.form.budgetOptions[2],message:''});
   const [formOk, setFormOk] = uS(false);
   const [formSending, setFormSending] = uS(false);
+
+  uE(() => {
+    if (window.Calendly) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    document.head.appendChild(script);
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
     setFormSending(true);
     try {
-      await fetch(FORMSPREE, {
+      await fetch('https://formspree.io/f/xeevgyga', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
         body: JSON.stringify({
@@ -221,31 +229,8 @@ function Contact({ t }) {
         })
       });
       setFormOk(true);
-    } catch(err) {
-      console.error(err);
-    }
+    } catch(err) { console.error(err); }
     setFormSending(false);
-  }
-
-  async function confirmSlot() {
-    if (!slot && slot !== 0) return;
-    setSlotSending(true);
-    const s = t.slots[slot];
-    try {
-      await fetch(FORMSPREE, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        body: JSON.stringify({
-          _subject: `Discovery call request — ${s.day} ${s.date} at ${s.time}`,
-          message: `Discovery call slot requested: ${s.day} ${s.date} at ${s.time} CET`,
-          email: 'slot-booking@wlsn.ch'
-        })
-      });
-      setSlotOk(true);
-    } catch(err) {
-      console.error(err);
-    }
-    setSlotSending(false);
   }
 
   return (
@@ -274,24 +259,19 @@ function Contact({ t }) {
           <div className="book-card">
             <h3>{t.book.title}</h3>
             <p>{t.book.desc}</p>
-            <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginBottom:14,letterSpacing:'0.06em'}}>{t.book.timezone}</div>
-            {t.slots.map((s,i) => (
-              <div key={i} className={`book-slot ${slot===i?'selected':''}`} onClick={()=>{setSlot(i); setSlotOk(false);}}>
-                <div className="date"><strong>{s.day}</strong> · {s.date}</div>
-                <div className="time">{s.time}</div>
-              </div>
-            ))}
-            {slot !== null && (
-              <button onClick={confirmSlot} disabled={slotSending||slotOk} className="btn btn-primary" style={{marginTop:16,width:'100%',justifyContent:'center'}}>
-                {slotOk ? '✓ ' + t.book.confirmed : slotSending ? '...' : t.book.confirm + ' →'}
-              </button>
-            )}
+            <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginBottom:16,letterSpacing:'0.06em'}}>{t.book.timezone}</div>
+            <div
+              className="calendly-inline-widget"
+              data-url="https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1a1f2e&text_color=f0f0ee&primary_color=c8f53a"
+              style={{minWidth:'100%',height:'520px'}}
+            />
           </div>
         </div>
       </div>
     </section>
   );
 }
+
 
 function Footer({ t }) {
   return (
