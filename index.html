@@ -1016,23 +1016,7 @@ function Estimator({ t, lang }) {
                     <div className="field-lbl">{t.est.notesLbl}</div>
                     <div style={{color:'var(--fg-dim)',fontSize:13,marginTop:6,fontStyle:'italic'}}>{result.notes}</div>
                   </>}
-                  <hr/>
-                  <div className="field-lbl" style={{marginBottom:8}}>ESTIMATED MONTHLY RUNNING COSTS</div>
-                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-                    <span style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)'}}>Haiku (fast, cheap)</span>
-                    <div style={{flex:1,height:4,background:'var(--border)',borderRadius:2}}>
-                      <div style={{width:'15%',height:'100%',background:'var(--accent)',borderRadius:2}}/>
-                    </div>
-                    <span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent)',minWidth:60}}>~CHF 3–8/mo</span>
-                  </div>
-                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:4}}>
-                    <span style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)'}}>Sonnet (smart)</span>
-                    <div style={{flex:1,height:4,background:'var(--border)',borderRadius:2}}>
-                      <div style={{width:'55%',height:'100%',background:'var(--accent-2)',borderRadius:2}}/>
-                    </div>
-                    <span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent-2)',minWidth:60}}>~CHF 40–180/mo</span>
-                  </div>
-                  <div style={{fontFamily:'var(--font-mono)',fontSize:10,color:'var(--fg-faint)',marginTop:4}}>Based on ~50k tokens/day usage</div>
+
                   <hr/>
                   <button
                     className="estimate-btn"
@@ -1240,7 +1224,13 @@ function Footer({ t }) {
             {t.footer.cols.map((c,i) => (
               <div className="col" key={i}>
                 <h5>{c.h}</h5>
-                {c.links.map((l,j) => <a key={j} href="#">{l}</a>)}
+                {c.links.map((l,j) => {
+              const href = l === 'LinkedIn' ? 'https://www.linkedin.com/in/shami-wilson-540b94142/' :
+                           l === 'shami@wlsn.ch' ? 'mailto:shami@wlsn.ch' :
+                           l === 'Book a call' || l === 'Termin buchen' ? '#contact' :
+                           l === 'LinkedIn' ? 'https://www.linkedin.com/in/shami-wilson-540b94142/' : '#';
+              return <a key={j} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener">{l}</a>;
+            })}
               </div>
             ))}
           </div>
