@@ -194,13 +194,59 @@ Brief: ${desc}`;
   );
 }
 
+const FORMSPREE = 'https://formspree.io/f/xeevgyga';
+
 function Contact({ t }) {
   const [slot, setSlot] = uS(null);
   const [slotOk, setSlotOk] = uS(false);
+  const [slotSending, setSlotSending] = uS(false);
   const [form, setForm] = uS({name:'',email:'',company:'',budget:t.form.budgetOptions[2],message:''});
   const [formOk, setFormOk] = uS(false);
+  const [formSending, setFormSending] = uS(false);
 
-  function submit(e) { e.preventDefault(); setFormOk(true); }
+  async function submit(e) {
+    e.preventDefault();
+    setFormSending(true);
+    try {
+      await fetch(FORMSPREE, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          company: form.company,
+          budget: form.budget,
+          message: form.message,
+          _subject: `New enquiry from ${form.name} — wlsn.ch`
+        })
+      });
+      setFormOk(true);
+    } catch(err) {
+      console.error(err);
+    }
+    setFormSending(false);
+  }
+
+  async function confirmSlot() {
+    if (!slot && slot !== 0) return;
+    setSlotSending(true);
+    const s = t.slots[slot];
+    try {
+      await fetch(FORMSPREE, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+          _subject: `Discovery call request — ${s.day} ${s.date} at ${s.time}`,
+          message: `Discovery call slot requested: ${s.day} ${s.date} at ${s.time} CET`,
+          email: 'slot-booking@wlsn.ch'
+        })
+      });
+      setSlotOk(true);
+    } catch(err) {
+      console.error(err);
+    }
+    setSlotSending(false);
+  }
 
   return (
     <section className="section" id="contact" style={{background: 'var(--bg-elev)', borderTop:'1px solid var(--border)'}}>
@@ -220,8 +266,8 @@ function Contact({ t }) {
             </select>
             <div className="field-lbl">{t.form.message}</div>
             <textarea required placeholder={t.form.messagePh} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} />
-            <button type="submit" className="btn btn-primary" style={{alignSelf:'flex-start'}}>
-              {formOk ? '✓ ' + t.form.submitted : t.form.submit + ' →'}
+            <button type="submit" className="btn btn-primary" style={{alignSelf:'flex-start'}} disabled={formSending||formOk}>
+              {formOk ? '✓ ' + t.form.submitted : formSending ? '...' : t.form.submit + ' →'}
             </button>
           </form>
 
@@ -236,8 +282,8 @@ function Contact({ t }) {
               </div>
             ))}
             {slot !== null && (
-              <button onClick={()=>setSlotOk(true)} className="btn btn-primary" style={{marginTop:16,width:'100%',justifyContent:'center'}}>
-                {slotOk ? '✓ ' + t.book.confirmed : t.book.confirm + ' →'}
+              <button onClick={confirmSlot} disabled={slotSending||slotOk} className="btn btn-primary" style={{marginTop:16,width:'100%',justifyContent:'center'}}>
+                {slotOk ? '✓ ' + t.book.confirmed : slotSending ? '...' : t.book.confirm + ' →'}
               </button>
             )}
           </div>
@@ -254,8 +300,11 @@ function Footer({ t }) {
         <div className="footer-grid">
           <div className="brand-col">
             <div className="logo">
-              <div className="logo-mark">W</div>
-              <span>WLSN</span>
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+                <rect width="32" height="32" rx="6" fill="var(--accent)"/>
+                <polyline points="6,8 11,24 16,14 21,24 26,8" stroke="oklch(0.16 0.012 240)" strokeWidth="2.8" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+              </svg>
+              <span style={{letterSpacing:'0.08em',fontSize:'15px',fontWeight:700}}>WLSN</span>
             </div>
             <p>{t.footer.tagline}</p>
           </div>
@@ -270,7 +319,7 @@ function Footer({ t }) {
         </div>
         <div className="footer-bottom">
           <div>{t.footer.bottom}</div>
-          <div>v2.1 · last deploy 2 days ago</div>
+          <div>v2.1 · last deploy today</div>
         </div>
       </div>
     </footer>
