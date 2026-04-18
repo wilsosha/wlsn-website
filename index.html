@@ -3,14 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>WLSN — IT & AI Services · Zürich</title>
+<title>WLSN — IT &amp; AI Services · Zürich</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23c8f53a'/%3E%3Cpolyline points='6,8 11,24 16,14 21,24 26,8' stroke='%230a0a0b' stroke-width='2.8' stroke-linecap='square' stroke-linejoin='miter' fill='none'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
-<style>
-:root {
+<style>:root {
   --bg: oklch(0.16 0.012 240);
   --bg-elev: oklch(0.20 0.014 240);
   --bg-card: oklch(0.22 0.014 240);
@@ -431,7 +430,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   .section { padding: 64px 0; }
   .hero { padding: 56px 0 48px; }
 }
-
 </style>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
@@ -444,8 +442,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 const TWEAK_DEFAULTS = {"accentHue": 145, "accentVariant": "lime", "showGrain": true};
 window.__TWEAKS__ = Object.assign({}, TWEAK_DEFAULTS);
 </script>
-<script type="text/babel">
-// ===== Bilingual content store — WLSN · Shami Wilson =====
+<script type="text/babel">// ===== Bilingual content store — WLSN · Shami Wilson =====
 
 const CONTENT = {
   en: {
@@ -753,7 +750,6 @@ const CONTENT = {
 };
 
 window.CONTENT = CONTENT;
-
 // ===== Shared small components =====
 const { useState, useEffect, useRef, useMemo } = React;
 
@@ -838,7 +834,6 @@ function SectionHead({ label, title, desc, id }) {
 }
 
 Object.assign(window, { Nav, Hero, SectionHead });
-
 // ===== Major sections =====
 const { useState: uS, useEffect: uE, useRef: uR } = React;
 
@@ -938,19 +933,15 @@ function Estimator({ t, lang }) {
   async function run() {
     if (!desc.trim() || loading) return;
     setLoading(true); setErr(null); setResult(null);
-    const prompt = `You are an estimation assistant for an independent IT/AI consultant. Based on this project brief, produce a realistic rough estimate. Respond in ${lang === 'de' ? 'German' : 'English'}. Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
-{"range": "e.g. €5.000 – €9.000", "timeline": "e.g. 3–5 weeks", "complexity": "Low | Medium | High", "scope": ["bullet", "bullet", "bullet"], "notes": "one short sentence of caveats"}
-
-Project type: ${type}
-Timeline preference: ${urg}
-Brief: ${desc}`;
+    const prompt = `You are an estimation assistant for an independent IT/AI consultant based in Zurich, Switzerland. Prices are in CHF. Based on this project brief, produce a realistic rough estimate. Respond in ${lang === 'de' ? 'German' : 'English'}. Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just the raw JSON object with this exact shape: {"range": "e.g. CHF 2000 - CHF 5000", "timeline": "e.g. 3-5 weeks", "complexity": "Low or Medium or High", "scope": ["bullet point 1", "bullet point 2", "bullet point 3"], "notes": "one short sentence of caveats"}. Project type: ${type}. Timeline preference: ${urg}. Brief: ${desc}`;
     try {
-      const raw = await window.claude.complete(prompt);
-      // strip any fences just in case
-      const cleaned = raw.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error('No JSON found');
-      const parsed = JSON.parse(match[0]);
+      const response = await fetch('/api/estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const parsed = await response.json();
+      if (parsed.error) throw new Error(parsed.error);
       setResult(parsed);
     } catch (e) {
       setErr(lang === 'de' ? 'Konnte die Antwort nicht parsen. Bitte erneut versuchen.' : "Couldn't parse the response. Try again.");
@@ -1222,7 +1213,6 @@ function Footer({ t }) {
 }
 
 Object.assign(window, { Services, Process, Stack, Pricing, Estimator, Contact, Footer });
-
 // ===== App root =====
 const { useState: useS, useEffect: useE } = React;
 
@@ -1310,7 +1300,6 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-
 </script>
 </body>
 </html>
