@@ -1,3 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WLSN — IT & AI Services · Zürich</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23c8f53a'/%3E%3Cpolyline points='6,8 11,24 16,14 21,24 26,8' stroke='%230a0a0b' stroke-width='2.8' stroke-linecap='square' stroke-linejoin='miter' fill='none'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: oklch(0.16 0.012 240);
+  --bg-elev: oklch(0.20 0.014 240);
+  --bg-card: oklch(0.22 0.014 240);
+  --border: oklch(0.30 0.015 240);
+  --border-strong: oklch(0.42 0.018 240);
+  --fg: oklch(0.97 0.004 240);
+  --fg-dim: oklch(0.72 0.008 240);
+  --fg-faint: oklch(0.52 0.010 240);
+  --accent: oklch(0.82 0.18 145);
+  --accent-soft: oklch(0.82 0.18 145 / 0.12);
+  --accent-2: oklch(0.78 0.17 295);
+  --accent-2-soft: oklch(0.78 0.17 295 / 0.14);
+  --danger: oklch(0.70 0.20 25);
+  --radius: 14px;
+  --radius-lg: 20px;
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(800px 500px at 85% -10%, oklch(0.82 0.18 var(--accent-h, 145) / 0.10), transparent 60%),
+    radial-gradient(700px 420px at -10% 10%, oklch(0.78 0.17 295 / 0.08), transparent 60%);
+  z-index: 0;
+}
+body.grain::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  z-index: 1;
+}
+
+h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ——— NAV ——— */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(18px);
+  background: oklch(0.16 0.012 240 / 0.72);
+  border-bottom: 1px solid oklch(0.30 0.015 240 / 0.5);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.logo {
+  font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--accent);
+  display: grid; place-items: center;
+  color: oklch(0.16 0.012 240); font-weight: 800;
+  box-shadow: 0 0 0 1px oklch(0.82 0.18 145 / 0.3), 0 6px 24px oklch(0.82 0.18 145 / 0.35);
+}
+.nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--fg-dim); }
+.nav-links a:hover { color: var(--fg); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.lang-toggle {
+  display: inline-flex; padding: 3px; background: var(--bg-elev); border: 1px solid var(--border);
+  border-radius: 999px; font-family: var(--font-mono); font-size: 11px;
+}
+.lang-toggle button { padding: 5px 10px; border-radius: 999px; color: var(--fg-faint); letter-spacing: 0.05em; }
+.lang-toggle button.on { background: var(--fg); color: var(--bg); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-weight: 500; font-size: 14px;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn-primary {
+  background: var(--accent); color: oklch(0.16 0.012 240);
+  box-shadow: 0 6px 24px oklch(0.82 0.18 145 / 0.25);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px oklch(0.82 0.18 145 / 0.40); }
+.btn-ghost { border: 1px solid var(--border-strong); color: var(--fg); }
+.btn-ghost:hover { border-color: var(--fg); background: var(--bg-elev); }
+
+/* ——— HERO ——— */
+.hero { padding: 96px 0 72px; position: relative; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+  color: var(--fg-dim);
+  padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--bg-elev);
+}
+.hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero h1 {
+  font-size: clamp(48px, 7vw, 104px);
+  line-height: 0.96;
+  margin: 28px 0 24px;
+  max-width: 15ch;
+  letter-spacing: -0.035em;
+}
+.hero h1 .accent { color: var(--accent); }
+.hero h1 .accent2 { color: var(--accent-2); font-style: italic; font-weight: 500; }
+
+.hero-sub {
+  max-width: 58ch;
+  color: var(--fg-dim);
+  font-size: 18px;
+  margin-bottom: 36px;
+}
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; }
+
+.hero-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+  padding: 28px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  max-width: 820px;
+}
+.hero-stat .num { font-family: var(--font-display); font-size: 34px; font-weight: 600; letter-spacing: -0.03em; }
+.hero-stat .lbl { font-size: 12px; color: var(--fg-faint); font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+
+/* ——— SECTION ——— */
+.section { padding: 96px 0; position: relative; }
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-bottom: 56px; flex-wrap: wrap; }
+.section-label {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.section-label::before { content: ""; width: 20px; height: 1px; background: var(--accent); }
+.section-title { font-size: clamp(36px, 4.4vw, 60px); line-height: 1.02; letter-spacing: -0.03em; max-width: 16ch; margin-top: 16px; }
+.section-desc { max-width: 44ch; color: var(--fg-dim); font-size: 16px; }
+
+/* ——— SERVICES ——— */
+.services {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.service {
+  background: var(--bg);
+  padding: 36px 32px;
+  transition: background 0.2s ease;
+  position: relative;
+  min-height: 240px;
+  display: flex; flex-direction: column;
+}
+.service:hover { background: var(--bg-elev); }
+.service .num { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); letter-spacing: 0.08em; }
+.service .tag {
+  position: absolute; top: 28px; right: 28px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+}
+.service .tag.ai { background: var(--accent-2-soft); color: var(--accent-2); }
+.service .tag.core { background: var(--accent-soft); color: var(--accent); }
+.service h3 { font-size: 24px; letter-spacing: -0.015em; margin: 16px 0 12px; }
+.service p { color: var(--fg-dim); font-size: 14.5px; line-height: 1.55; }
+.service ul { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.service ul li {
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 3px 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--fg-dim);
+}
+
+/* ——— PROCESS ——— */
+.process {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+}
+.process-step {
+  padding: 28px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-elev);
+  position: relative;
+}
+.process-step .step-num {
+  font-family: var(--font-display); font-size: 14px; color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.process-step h4 { font-size: 20px; margin: 16px 0 10px; letter-spacing: -0.015em; }
+.process-step p { font-size: 14px; color: var(--fg-dim); }
+.process-step .duration { margin-top: 14px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+
+/* ——— STACK ——— */
+.stack-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+}
+.stack-col h4 {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--fg-faint); margin-bottom: 18px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.stack-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.stack-col li { font-size: 15px; color: var(--fg); display: flex; align-items: center; gap: 10px; }
+.stack-col li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+
+/* ——— PRICING ——— */
+.pricing {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+}
+.price-card {
+  padding: 36px 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elev);
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.price-card.featured {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, oklch(0.82 0.18 145 / 0.06), transparent 60%), var(--bg-elev);
+  box-shadow: 0 20px 60px oklch(0.82 0.18 145 / 0.10);
+}
+.price-card .badge {
+  position: absolute; top: -12px; left: 32px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 10px; background: var(--accent); color: var(--bg); border-radius: 4px;
+}
+.price-card .plan-name { font-family: var(--font-mono); font-size: 12px; color: var(--fg-faint); letter-spacing: 0.08em; text-transform: uppercase; }
+.price-card h3 { font-size: 28px; margin: 8px 0 20px; letter-spacing: -0.02em; }
+.price-card .range { font-family: var(--font-display); font-size: 38px; font-weight: 600; letter-spacing: -0.03em; }
+.price-card .range small { font-size: 14px; color: var(--fg-dim); font-weight: 400; letter-spacing: 0; margin-left: 6px; font-family: var(--font-body); }
+.price-card .timeline { color: var(--fg-dim); font-size: 13px; margin-top: 6px; }
+.price-card hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+.price-card ul { list-style: none; padding: 0; margin: 0 0 28px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.price-card ul li { font-size: 14px; color: var(--fg-dim); display: flex; gap: 10px; }
+.price-card ul li::before { content: "→"; color: var(--accent); font-family: var(--font-mono); }
+
+/* ——— AI ESTIMATOR ——— */
+.estimator-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, oklch(0.78 0.17 295 / 0.07), transparent 50%), var(--bg-elev);
+  overflow: hidden;
+}
+.estimator-head {
+  padding: 24px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 12px; color: var(--fg-dim);
+}
+.estimator-head .live { display: flex; align-items: center; gap: 8px; }
+.estimator-head .live .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2); animation: pulse 2s infinite; }
+.estimator-body { padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.estimator-body label { display: block; font-size: 12px; color: var(--fg-faint); font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+.estimator-body textarea, .estimator-body input, .estimator-body select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.estimator-body textarea:focus, .estimator-body input:focus, .estimator-body select:focus {
+  border-color: var(--accent-2);
+}
+.estimator-body textarea { min-height: 140px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.chip {
+  padding: 7px 12px; border-radius: 999px;
+  font-size: 12.5px; font-family: var(--font-mono);
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--fg-dim); cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover { border-color: var(--fg-dim); }
+.chip.on { background: var(--accent-2-soft); border-color: var(--accent-2); color: var(--accent-2); }
+
+.estimate-btn {
+  margin-top: 20px;
+  background: var(--accent-2);
+  color: var(--bg);
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 6px 24px oklch(0.78 0.17 295 / 0.28);
+  transition: transform 0.15s ease;
+}
+.estimate-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.estimate-btn:disabled { opacity: 0.6; cursor: wait; }
+
+.estimate-output {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  min-height: 280px;
+  display: flex; flex-direction: column;
+  font-size: 14px; line-height: 1.6;
+}
+.estimate-output.empty { color: var(--fg-faint); justify-content: center; align-items: center; text-align: center; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.04em; }
+.estimate-output .field-lbl { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); }
+.estimate-output .field-val { color: var(--fg); margin-top: 4px; }
+.estimate-output .range-big { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--accent-2); }
+.estimate-output hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+.estimate-output ul { padding-left: 18px; margin: 0; color: var(--fg-dim); }
+.estimate-output ul li { margin-bottom: 4px; }
+
+.spinner {
+  width: 16px; height: 16px; border: 2px solid oklch(0.16 0.012 240 / 0.3);
+  border-top-color: oklch(0.16 0.012 240); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ——— CONTACT ——— */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: flex-start; }
+.contact-form { display: flex; flex-direction: column; gap: 18px; }
+.contact-form input, .contact-form textarea, .contact-form select {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--fg); font-family: var(--font-body); font-size: 15px;
+  outline: none;
+}
+.contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus { border-color: var(--accent); }
+.contact-form textarea { min-height: 140px; resize: vertical; }
+.contact-form .field-lbl { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: -10px; }
+
+.book-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-elev); padding: 32px;
+}
+.book-card h3 { font-size: 24px; margin-bottom: 8px; }
+.book-card p { color: var(--fg-dim); font-size: 14px; margin-bottom: 24px; }
+.book-slot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  background: var(--bg);
+}
+.book-slot:hover { border-color: var(--accent); }
+.book-slot.selected { border-color: var(--accent); background: var(--accent-soft); }
+.book-slot .date { font-family: var(--font-mono); font-size: 13px; }
+.book-slot .time { color: var(--fg-dim); font-size: 13px; font-family: var(--font-mono); }
+
+/* ——— FOOTER ——— */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 56px 0 40px;
+  margin-top: 40px;
+}
+.footer-grid { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+.footer-grid .brand-col { max-width: 320px; }
+.footer-grid .brand-col p { color: var(--fg-dim); font-size: 14px; margin-top: 16px; }
+.footer-links { display: flex; gap: 56px; font-size: 14px; }
+.footer-links .col { display: flex; flex-direction: column; gap: 10px; }
+.footer-links .col h5 { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 4px; }
+.footer-links a { color: var(--fg-dim); }
+.footer-links a:hover { color: var(--fg); }
+.footer-bottom { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; color: var(--fg-faint); }
+
+/* ——— TWEAKS PANEL ——— */
+.tweaks-panel {
+  position: fixed; bottom: 24px; right: 24px; z-index: 100;
+  width: 280px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  font-size: 13px;
+}
+.tweaks-panel h4 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 14px; }
+.tweak-row { margin-bottom: 14px; }
+.tweak-row label { display: block; font-size: 12px; color: var(--fg-dim); margin-bottom: 6px; }
+.tweak-swatches { display: flex; gap: 6px; }
+.tweak-swatch { width: 28px; height: 28px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+.tweak-swatch.on { border-color: var(--fg); }
+
+/* ——— RESPONSIVE ——— */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .container { padding: 0 20px; }
+  .services { grid-template-columns: 1fr; }
+  .process { grid-template-columns: 1fr 1fr; }
+  .stack-grid { grid-template-columns: 1fr 1fr; }
+  .pricing { grid-template-columns: 1fr; }
+  .estimator-body { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .hero-stats { grid-template-columns: 1fr 1fr; }
+  .section { padding: 64px 0; }
+  .hero { padding: 56px 0 48px; }
+}
+
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const TWEAK_DEFAULTS = {"accentHue": 145, "accentVariant": "lime", "showGrain": true};
+window.__TWEAKS__ = Object.assign({}, TWEAK_DEFAULTS);
+</script>
+<script type="text/babel">
 // ===== Bilingual content store — WLSN · Shami Wilson =====
 
 const CONTENT = {
@@ -306,3 +751,490 @@ const CONTENT = {
 };
 
 window.CONTENT = CONTENT;
+
+// ===== Shared small components =====
+const { useState, useEffect, useRef, useMemo } = React;
+
+function Nav({ lang, setLang, t }) {
+  return (
+    <nav className="nav">
+      <div className="container nav-inner">
+        <div className="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+            <rect width="32" height="32" rx="6" fill="var(--accent)"/>
+            <polyline points="6,8 11,24 16,14 21,24 26,8" stroke="oklch(0.16 0.012 240)" strokeWidth="2.8" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+          </svg>
+          <span style={{letterSpacing:'0.08em',fontSize:'15px',fontWeight:700}}>WLSN</span>
+        </div>
+        <div className="nav-links">
+          <a href="#services">{t.nav.services}</a>
+          <a href="#process">{t.nav.process}</a>
+          <a href="#stack">{t.nav.stack}</a>
+          <a href="#pricing">{t.nav.pricing}</a>
+          <a href="#estimator">{t.nav.estimator}</a>
+          <a href="#contact">{t.nav.contact}</a>
+        </div>
+        <div className="nav-right">
+          <div className="lang-toggle">
+            <button className={lang==='en'?'on':''} onClick={()=>setLang('en')}>EN</button>
+            <button className={lang==='de'?'on':''} onClick={()=>setLang('de')}>DE</button>
+          </div>
+          <a href="#contact" className="btn btn-primary">{t.ctaPrimary} →</a>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function Hero({ t, lang }) {
+  return (
+    <section className="hero">
+      <div className="container">
+        <div className="hero-eyebrow">
+          <span className="dot"/>
+          <span>{t.hero.eyebrow}</span>
+        </div>
+        {lang === 'en' ? (
+          <h1>
+            Software,<br/>systems, and <span className="accent">AI</span><br/>
+            that <span className="accent2">actually</span> ship.
+          </h1>
+        ) : (
+          <h1>
+            Software,<br/>Systeme und <span className="accent">KI,</span><br/>
+            die <span className="accent2">wirklich</span> liefern.
+          </h1>
+        )}
+        <p className="hero-sub">{lang === 'en' ? t.hero.sub : t.heroSub}</p>
+        <div className="hero-cta">
+          <a href="#contact" className="btn btn-primary">{t.ctaPrimary} →</a>
+          <a href="#estimator" className="btn btn-ghost">{lang === 'en' ? 'Try the AI estimator' : 'KI-Rechner testen'}</a>
+        </div>
+        <div className="hero-stats">
+          {t.stats.map((s,i) => (
+            <div className="hero-stat" key={i}>
+              <div className="num">{s.num}</div>
+              <div className="lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHead({ label, title, desc, id }) {
+  return (
+    <div className="section-head" id={id}>
+      <div>
+        <div className="section-label">{label}</div>
+        <h2 className="section-title">{title}</h2>
+      </div>
+      {desc && <p className="section-desc">{desc}</p>}
+    </div>
+  );
+}
+
+Object.assign(window, { Nav, Hero, SectionHead });
+
+// ===== Major sections =====
+const { useState: uS, useEffect: uE, useRef: uR } = React;
+
+function Services({ t }) {
+  return (
+    <section className="section" id="services">
+      <div className="container">
+        <SectionHead label={t.servicesLabel} title={t.servicesTitle} desc={t.servicesDesc} />
+        <div className="services">
+          {t.services.map((s, i) => (
+            <div className="service" key={i}>
+              <div className="num">{String(i+1).padStart(2,'0')} / {String(t.services.length).padStart(2,'0')}</div>
+              <span className={`tag ${s.tag === 'AI' ? 'ai' : 'core'}`}>{s.tag}</span>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+              <ul>{s.stack.map((x,j) => <li key={j}>{x}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Process({ t }) {
+  return (
+    <section className="section" id="process" style={{background: 'var(--bg-elev)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)'}}>
+      <div className="container">
+        <SectionHead label={t.processLabel} title={t.processTitle} desc={t.processDesc} />
+        <div className="process">
+          {t.process.map((p,i) => (
+            <div className="process-step" key={i}>
+              <div className="step-num">{p.num}</div>
+              <h4>{p.title}</h4>
+              <p>{p.desc}</p>
+              <div className="duration">{p.duration}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stack({ t }) {
+  return (
+    <section className="section" id="stack">
+      <div className="container">
+        <SectionHead label={t.stackLabel} title={t.stackTitle} desc={t.stackDesc} />
+        <div className="stack-grid">
+          {t.stack.map((col,i) => (
+            <div className="stack-col" key={i}>
+              <h4>{col.title}</h4>
+              <ul>{col.items.map((x,j) => <li key={j}>{x}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing({ t }) {
+  return (
+    <section className="section" id="pricing" style={{background: 'var(--bg-elev)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)'}}>
+      <div className="container">
+        <SectionHead label={t.pricingLabel} title={t.pricingTitle} desc={t.pricingDesc} />
+        <div className="pricing">
+          {t.pricing.map((p,i) => (
+            <div className={`price-card ${p.featured ? 'featured' : ''}`} key={i}>
+              {p.badge && <span className="badge">{p.badge}</span>}
+              <div className="plan-name">{p.plan}</div>
+              <h3>{p.name}</h3>
+              <div className="range">{p.range}</div>
+              <div className="timeline">{p.timeline}</div>
+              <hr/>
+              <ul>{p.features.map((f,j) => <li key={j}>{f}</li>)}</ul>
+              <a href="#contact" className={`btn ${p.featured ? 'btn-primary' : 'btn-ghost'}`} style={{justifyContent:'center'}}>
+                {p.featured ? 'Start →' : 'Enquire'}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Estimator({ t, lang }) {
+  const [desc, setDesc] = uS('');
+  const [type, setType] = uS(t.est.types[0]);
+  const [urg, setUrg] = uS(t.est.urgency[1]);
+  const [loading, setLoading] = uS(false);
+  const [result, setResult] = uS(null);
+  const [err, setErr] = uS(null);
+
+  async function run() {
+    if (!desc.trim() || loading) return;
+    setLoading(true); setErr(null); setResult(null);
+    const prompt = `You are an estimation assistant for an independent IT/AI consultant. Based on this project brief, produce a realistic rough estimate. Respond in ${lang === 'de' ? 'German' : 'English'}. Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
+{"range": "e.g. €5.000 – €9.000", "timeline": "e.g. 3–5 weeks", "complexity": "Low | Medium | High", "scope": ["bullet", "bullet", "bullet"], "notes": "one short sentence of caveats"}
+
+Project type: ${type}
+Timeline preference: ${urg}
+Brief: ${desc}`;
+    try {
+      const raw = await window.claude.complete(prompt);
+      // strip any fences just in case
+      const cleaned = raw.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('No JSON found');
+      const parsed = JSON.parse(match[0]);
+      setResult(parsed);
+    } catch (e) {
+      setErr(lang === 'de' ? 'Konnte die Antwort nicht parsen. Bitte erneut versuchen.' : "Couldn't parse the response. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="section" id="estimator">
+      <div className="container">
+        <SectionHead label={t.estLabel} title={t.estTitle} desc={t.estDesc} />
+        <div className="estimator-wrap">
+          <div className="estimator-head">
+            <div className="live"><span className="dot"/><span>LIVE · claude-haiku-4-5</span></div>
+            <div>POST /v1/messages</div>
+          </div>
+          <div className="estimator-body">
+            <div>
+              <label>{t.est.descLabel}</label>
+              <textarea value={desc} onChange={e=>setDesc(e.target.value)} placeholder={t.est.descPlaceholder} />
+
+              <div style={{marginTop:18}}>
+                <label>{t.est.typeLabel}</label>
+                <div className="chip-row">
+                  {t.est.types.map(x => (
+                    <button key={x} className={`chip ${type===x?'on':''}`} onClick={()=>setType(x)}>{x}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{marginTop:18}}>
+                <label>{t.est.urgencyLabel}</label>
+                <div className="chip-row">
+                  {t.est.urgency.map(x => (
+                    <button key={x} className={`chip ${urg===x?'on':''}`} onClick={()=>setUrg(x)}>{x}</button>
+                  ))}
+                </div>
+              </div>
+
+              <button className="estimate-btn" onClick={run} disabled={loading || !desc.trim()}>
+                {loading ? <><span className="spinner"/>{t.est.btnLoading}</> : <>✦ {t.est.btn}</>}
+              </button>
+            </div>
+
+            <div className={`estimate-output ${!result && !loading && !err ? 'empty' : ''}`}>
+              {!result && !loading && !err && <div>{t.est.emptyState}</div>}
+              {loading && <div style={{display:'flex',alignItems:'center',gap:10,color:'var(--fg-dim)',fontFamily:'var(--font-mono)',fontSize:12.5}}><span className="spinner" style={{borderTopColor:'var(--accent-2)', borderColor:'oklch(0.78 0.17 295 / 0.2)'}}/>Analyzing…</div>}
+              {err && <div style={{color:'var(--danger)',fontSize:13}}>{err}</div>}
+              {result && (
+                <>
+                  <div className="field-lbl">{t.est.rangeLbl}</div>
+                  <div className="range-big">{result.range}</div>
+                  <hr/>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
+                    <div>
+                      <div className="field-lbl">{t.est.timelineLbl}</div>
+                      <div className="field-val">{result.timeline}</div>
+                    </div>
+                    <div>
+                      <div className="field-lbl">{t.est.complexityLbl}</div>
+                      <div className="field-val">{result.complexity}</div>
+                    </div>
+                  </div>
+                  <hr/>
+                  <div className="field-lbl">{t.est.scopeLbl}</div>
+                  <ul style={{marginTop:8}}>
+                    {(result.scope || []).map((s,i) => <li key={i}>{s}</li>)}
+                  </ul>
+                  {result.notes && <>
+                    <hr/>
+                    <div className="field-lbl">{t.est.notesLbl}</div>
+                    <div style={{color:'var(--fg-dim)',fontSize:13,marginTop:6,fontStyle:'italic'}}>{result.notes}</div>
+                  </>}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const FORMSPREE = 'https://formspree.io/f/xeevgyga';
+
+function Contact({ t }) {
+  const [form, setForm] = uS({name:'',email:'',company:'',budget:t.form.budgetOptions[2],message:''});
+  const [formOk, setFormOk] = uS(false);
+  const [formSending, setFormSending] = uS(false);
+
+  uE(() => {
+    if (window.Calendly) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    document.head.appendChild(script);
+  }, []);
+
+  async function submit(e) {
+    e.preventDefault();
+    setFormSending(true);
+    try {
+      await fetch('https://formspree.io/f/xeevgyga', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          company: form.company,
+          budget: form.budget,
+          message: form.message,
+          _subject: `New enquiry from ${form.name} — wlsn.ch`
+        })
+      });
+      setFormOk(true);
+    } catch(err) { console.error(err); }
+    setFormSending(false);
+  }
+
+  return (
+    <section className="section" id="contact" style={{background: 'var(--bg-elev)', borderTop:'1px solid var(--border)'}}>
+      <div className="container">
+        <SectionHead label={t.contactLabel} title={t.contactTitle} desc={t.contactDesc} />
+        <div className="contact-grid">
+          <form className="contact-form" onSubmit={submit}>
+            <div className="field-lbl">{t.form.name}</div>
+            <input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
+            <div className="field-lbl">{t.form.email}</div>
+            <input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
+            <div className="field-lbl">{t.form.company}</div>
+            <input value={form.company} onChange={e=>setForm({...form,company:e.target.value})} />
+            <div className="field-lbl">{t.form.budget}</div>
+            <select value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})}>
+              {t.form.budgetOptions.map(o => <option key={o}>{o}</option>)}
+            </select>
+            <div className="field-lbl">{t.form.message}</div>
+            <textarea required placeholder={t.form.messagePh} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} />
+            <button type="submit" className="btn btn-primary" style={{alignSelf:'flex-start'}} disabled={formSending||formOk}>
+              {formOk ? '✓ ' + t.form.submitted : formSending ? '...' : t.form.submit + ' →'}
+            </button>
+          </form>
+
+          <div className="book-card">
+            <h3>{t.book.title}</h3>
+            <p>{t.book.desc}</p>
+            <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginBottom:16,letterSpacing:'0.06em'}}>{t.book.timezone}</div>
+            <div
+              className="calendly-inline-widget"
+              data-url="https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1a1f2e&text_color=f0f0ee&primary_color=c8f53a"
+              style={{minWidth:'100%',height:'520px'}}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+function Footer({ t }) {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-grid">
+          <div className="brand-col">
+            <div className="logo">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+                <rect width="32" height="32" rx="6" fill="var(--accent)"/>
+                <polyline points="6,8 11,24 16,14 21,24 26,8" stroke="oklch(0.16 0.012 240)" strokeWidth="2.8" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+              </svg>
+              <span style={{letterSpacing:'0.08em',fontSize:'15px',fontWeight:700}}>WLSN</span>
+            </div>
+            <p>{t.footer.tagline}</p>
+          </div>
+          <div className="footer-links">
+            {t.footer.cols.map((c,i) => (
+              <div className="col" key={i}>
+                <h5>{c.h}</h5>
+                {c.links.map((l,j) => <a key={j} href="#">{l}</a>)}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <div>{t.footer.bottom}</div>
+          <div>v2.1 · last deploy today</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+Object.assign(window, { Services, Process, Stack, Pricing, Estimator, Contact, Footer });
+
+// ===== App root =====
+const { useState: useS, useEffect: useE } = React;
+
+const ACCENT_VARIANTS = {
+  lime:   { h: 145, c: 0.18, l: 0.82 },
+  cyan:   { h: 210, c: 0.16, l: 0.78 },
+  coral:  { h: 30,  c: 0.18, l: 0.76 },
+  violet: { h: 295, c: 0.17, l: 0.78 },
+};
+
+function App() {
+  const [lang, setLang] = useS(() => localStorage.getItem('lang') || 'en');
+  const [tweaks, setTweaks] = useS(window.__TWEAKS__);
+  const [editMode, setEditMode] = useS(false);
+
+  const t = window.CONTENT[lang];
+
+  useE(() => { localStorage.setItem('lang', lang); }, [lang]);
+
+  // Apply accent variant
+  useE(() => {
+    const v = ACCENT_VARIANTS[tweaks.accentVariant] || ACCENT_VARIANTS.lime;
+    const root = document.documentElement;
+    root.style.setProperty('--accent', `oklch(${v.l} ${v.c} ${v.h})`);
+    root.style.setProperty('--accent-soft', `oklch(${v.l} ${v.c} ${v.h} / 0.12)`);
+    document.body.classList.toggle('grain', !!tweaks.showGrain);
+  }, [tweaks]);
+
+  // Edit mode wiring
+  useE(() => {
+    function handler(e) {
+      if (e.data?.type === '__activate_edit_mode') setEditMode(true);
+      if (e.data?.type === '__deactivate_edit_mode') setEditMode(false);
+    }
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  function updateTweak(patch) {
+    const next = { ...tweaks, ...patch };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*');
+  }
+
+  return (
+    <>
+      <Nav lang={lang} setLang={setLang} t={t} />
+      <Hero t={t} lang={lang} />
+      <Services t={t} />
+      <Process t={t} />
+      <Stack t={t} />
+      <Pricing t={t} />
+      <Estimator t={t} lang={lang} />
+      <Contact t={t} />
+      <Footer t={t} />
+
+      {editMode && (
+        <div className="tweaks-panel">
+          <h4>Tweaks</h4>
+          <div className="tweak-row">
+            <label>Accent color</label>
+            <div className="tweak-swatches">
+              {Object.entries(ACCENT_VARIANTS).map(([name, v]) => (
+                <div
+                  key={name}
+                  className={`tweak-swatch ${tweaks.accentVariant===name?'on':''}`}
+                  style={{background: `oklch(${v.l} ${v.c} ${v.h})`}}
+                  onClick={() => updateTweak({ accentVariant: name })}
+                  title={name}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="tweak-row">
+            <label>
+              <input type="checkbox" checked={!!tweaks.showGrain} onChange={e => updateTweak({ showGrain: e.target.checked })} style={{marginRight:8}} />
+              Film grain overlay
+            </label>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+</script>
+</body>
+</html>
