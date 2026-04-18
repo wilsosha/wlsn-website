@@ -436,7 +436,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript"></script>
 </head>
 <body>
 <div id="root"></div>
@@ -1047,6 +1047,16 @@ function Contact({ t }) {
   const [qualDone, setQualDone] = uS(false);
   const [qualErr, setQualErr] = uS(false);
 
+  uE(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    document.head.appendChild(script);
+  }, []);
+
   async function submit(e) {
     e.preventDefault();
     setFormSending(true);
@@ -1133,7 +1143,7 @@ function Contact({ t }) {
                   Tell me a bit about your project first — this helps me prepare for our call.
                 </div>
                 <div className="field-lbl">Your name</div>
-                <input required value={qual.name} onChange={e=>setQual({...qual,name:e.target.value})} placeholder="Shami Wilson" style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:'var(--fg)',fontFamily:'var(--font-body)',fontSize:14,outline:'none'}} />
+                <input required value={qual.name} onChange={e=>setQual({...qual,name:e.target.value})} placeholder="Jane Smith" style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:'var(--fg)',fontFamily:'var(--font-body)',fontSize:14,outline:'none'}} />
                 <div className="field-lbl">Your email</div>
                 <input type="email" required value={qual.email} onChange={e=>setQual({...qual,email:e.target.value})} placeholder="you@company.com" style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:'var(--fg)',fontFamily:'var(--font-body)',fontSize:14,outline:'none'}} />
                 <div className="field-lbl">Project type</div>
@@ -1153,12 +1163,20 @@ function Contact({ t }) {
               </form>
             ) : (
               <>
-                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--accent)',marginBottom:16,letterSpacing:'0.06em'}}>✓ Thanks {qual.name} — pick a slot below</div>
-                <div
-                  className="calendly-inline-widget"
-                  data-url="https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1"
-                  style={{minWidth:'100%',height:'520px'}}
-                />
+                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--accent)',marginBottom:20,letterSpacing:'0.06em'}}>✓ Thanks {qual.name} — pick a slot below</div>
+                <p style={{color:'var(--fg-dim)',fontSize:14,marginBottom:24,lineHeight:1.7}}>
+                  Click below to open the booking calendar. Choose a time that works for you — you'll get a confirmation email immediately.
+                </p>
+                <button
+                  className="btn btn-primary"
+                  style={{width:'100%',justifyContent:'center',fontSize:15,padding:'14px 20px'}}
+                  onClick={()=> window.Calendly && window.Calendly.initPopupWidget({url:'https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1'})}
+                >
+                  Open booking calendar →
+                </button>
+                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginTop:12,textAlign:'center',letterSpacing:'0.05em'}}>
+                  30 min · Phone call · Free · CET timezone
+                </div>
               </>
             )}
           </div>
