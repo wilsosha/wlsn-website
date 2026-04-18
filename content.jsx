@@ -132,7 +132,7 @@ const CONTENT = {
     book: {
       title: "Book a 30-minute discovery call",
       desc: "Free, no agenda needed. We figure out if there's a fit and what the next concrete step looks like.",
-      timezone: "All times CET · 30 min · free",
+      timezone: "30 min · Phone call · Free · Pick a slot below",
       confirm: "Confirm slot",
       confirmed: "Slot reserved — check your inbox.",
     },
@@ -281,7 +281,7 @@ const CONTENT = {
     book: {
       title: "30-Minuten-Erstgespräch buchen",
       desc: "Kostenlos, ohne Agenda. Wir klären, ob's passt und wie der nächste konkrete Schritt aussieht.",
-      timezone: "Alle Zeiten MEZ · 30 Min · kostenlos",
+      timezone: "30 Min · Telefonat · Kostenlos · Slot unten wählen",
       confirm: "Slot bestätigen",
       confirmed: "Slot reserviert — check deinen Posteingang.",
     },
