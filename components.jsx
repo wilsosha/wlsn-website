@@ -6,8 +6,11 @@ function Nav({ lang, setLang, t }) {
     <nav className="nav">
       <div className="container nav-inner">
         <div className="logo">
-          <div className="logo-mark">W</div>
-          <span>WLSN</span>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+            <rect width="32" height="32" rx="6" fill="var(--accent)"/>
+            <polyline points="6,8 11,24 16,14 21,24 26,8" stroke="oklch(0.16 0.012 240)" strokeWidth="2.8" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+          </svg>
+          <span style={{letterSpacing:'0.08em',fontSize:'15px',fontWeight:700}}>WLSN</span>
         </div>
         <div className="nav-links">
           <a href="#services">{t.nav.services}</a>
