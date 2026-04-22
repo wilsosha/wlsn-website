@@ -401,8 +401,7 @@ function Footer({ t }) {
         </div>
         <div className="footer-bottom">
           <div>{t.footer.bottom}</div>
-          <div>v2.1 · deployed {new Date(document.lastModified).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-        </div>
+          <div>v2.1 · deployed {new Date(document.lastModified).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>        </div>
       </div>
     </footer>
   );
