@@ -402,7 +402,7 @@ function Footer({ t }) {
         </div>
         <div className="footer-bottom">
           <div>{t.footer.bottom}</div>
-          <div>v2.1 · deployed {deployDate}</div>
+          <div>v2.1 · deployed: {deployDate}</div>
         </div>
       </div>
     </footer>
