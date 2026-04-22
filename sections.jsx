@@ -370,7 +370,7 @@ function Contact({ t }) {
 
 
 function Footer({ t }) {
-  const deployDate = new Date(document.lastModified).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const deployDate = window.__DEPLOY_DATE__ || "—";
   return (
     <footer className="footer">
       <div className="container">
@@ -402,7 +402,7 @@ function Footer({ t }) {
         </div>
         <div className="footer-bottom">
           <div>{t.footer.bottom}</div>
-          <div>v2.1 · deployed: {deployDate}</div>
+          <div>v2.1 · deployed {deployDate}</div>
         </div>
       </div>
     </footer>
