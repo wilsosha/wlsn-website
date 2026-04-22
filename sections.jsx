@@ -97,19 +97,15 @@ function Estimator({ t, lang }) {
   async function run() {
     if (!desc.trim() || loading) return;
     setLoading(true); setErr(null); setResult(null);
-    const prompt = `You are an estimation assistant for an independent IT/AI consultant. Based on this project brief, produce a realistic rough estimate. Respond in ${lang === 'de' ? 'German' : 'English'}. Return ONLY valid JSON (no markdown, no code fences) with this exact shape:
-{"range": "e.g. €5.000 – €9.000", "timeline": "e.g. 3–5 weeks", "complexity": "Low | Medium | High", "scope": ["bullet", "bullet", "bullet"], "notes": "one short sentence of caveats"}
-
-Project type: ${type}
-Timeline preference: ${urg}
-Brief: ${desc}`;
+    const prompt = `You are an estimation assistant for an independent IT/AI consultant based in Zurich, Switzerland. Prices are in CHF. Based on this project brief, produce a realistic rough estimate. Respond in ${lang === 'de' ? 'German' : 'English'}. Return ONLY valid JSON with NO markdown, NO code fences, NO extra text — just the raw JSON object with this exact shape: {"range": "e.g. CHF 2000 - CHF 5000", "timeline": "e.g. 3-5 weeks", "complexity": "Low or Medium or High", "scope": ["bullet point 1", "bullet point 2", "bullet point 3"], "notes": "one short sentence of caveats"}. Project type: ${type}. Timeline preference: ${urg}. Brief: ${desc}`;
     try {
-      const raw = await window.claude.complete(prompt);
-      // strip any fences just in case
-      const cleaned = raw.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error('No JSON found');
-      const parsed = JSON.parse(match[0]);
+      const response = await fetch('/api/estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const parsed = await response.json();
+      if (parsed.error) throw new Error(parsed.error);
       setResult(parsed);
     } catch (e) {
       setErr(lang === 'de' ? 'Konnte die Antwort nicht parsen. Bitte erneut versuchen.' : "Couldn't parse the response. Try again.");
@@ -184,6 +180,32 @@ Brief: ${desc}`;
                     <div className="field-lbl">{t.est.notesLbl}</div>
                     <div style={{color:'var(--fg-dim)',fontSize:13,marginTop:6,fontStyle:'italic'}}>{result.notes}</div>
                   </>}
+
+                  <hr/>
+                  <button
+                    className="estimate-btn"
+                    style={{marginTop:4,background:'var(--accent)',color:'oklch(0.16 0.012 240)',border:'none',cursor:'pointer'}}
+                    onClick={() => {
+                      fetch('https://formspree.io/f/xeevgyga', {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','Accept':'application/json'},
+                        body: JSON.stringify({
+                          _subject: 'Estimate locked in — ' + result.range,
+                          estimate_range: result.range,
+                          timeline: result.timeline,
+                          complexity: result.complexity,
+                          scope: (result.scope||[]).join(' | '),
+                          notes: result.notes,
+                          project_description: desc,
+                          project_type: type,
+                          urgency: urg
+                        })
+                      });
+                      alert('Estimate sent to shami@wlsn.ch — expect a reply within 48h.');
+                    }}
+                  >
+                    Lock in this estimate →
+                  </button>
                 </>
               )}
             </div>
@@ -201,8 +223,12 @@ function Contact({ t }) {
   const [formOk, setFormOk] = uS(false);
   const [formSending, setFormSending] = uS(false);
 
+  // Calendly qualifier state
+  const [qual, setQual] = uS({name:'',email:'',projectType:'',budget:''});
+  const [qualDone, setQualDone] = uS(false);
+  const [qualErr, setQualErr] = uS(false);
+
   uE(() => {
-    if (window.Calendly) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://assets.calendly.com/assets/external/widget.css';
@@ -225,7 +251,7 @@ function Contact({ t }) {
           company: form.company,
           budget: form.budget,
           message: form.message,
-          _subject: `New enquiry from ${form.name} — wlsn.ch`
+          _subject: `New project enquiry from ${form.name} — wlsn.ch`
         })
       });
       setFormOk(true);
@@ -233,39 +259,109 @@ function Contact({ t }) {
     setFormSending(false);
   }
 
+  function unlockCalendly(e) {
+    e.preventDefault();
+    if (!qual.name || !qual.email || !qual.projectType || !qual.budget) {
+      setQualErr(true);
+      return;
+    }
+    setQualErr(false);
+    // Send qualifier info to Formspree too
+    fetch('https://formspree.io/f/xeevgyga', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({
+        name: qual.name,
+        email: qual.email,
+        projectType: qual.projectType,
+        budget: qual.budget,
+        _subject: `Discovery call request from ${qual.name} — wlsn.ch`
+      })
+    });
+    setQualDone(true);
+  }
+
+  const projectTypes = ['Landing / website', 'Web app / dashboard', 'AI integration', 'Automation', 'RegTech / compliance', 'Not sure yet'];
+  const budgets = ['Under CHF 1k', 'CHF 1k–3k', 'CHF 3k–8k', 'CHF 8k–20k', 'CHF 20k+', 'Not sure yet'];
+
   return (
     <section className="section" id="contact" style={{background: 'var(--bg-elev)', borderTop:'1px solid var(--border)'}}>
       <div className="container">
         <SectionHead label={t.contactLabel} title={t.contactTitle} desc={t.contactDesc} />
         <div className="contact-grid">
-          <form className="contact-form" onSubmit={submit}>
-            <div className="field-lbl">{t.form.name}</div>
-            <input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
-            <div className="field-lbl">{t.form.email}</div>
-            <input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
-            <div className="field-lbl">{t.form.company}</div>
-            <input value={form.company} onChange={e=>setForm({...form,company:e.target.value})} />
-            <div className="field-lbl">{t.form.budget}</div>
-            <select value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})}>
-              {t.form.budgetOptions.map(o => <option key={o}>{o}</option>)}
-            </select>
-            <div className="field-lbl">{t.form.message}</div>
-            <textarea required placeholder={t.form.messagePh} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} />
-            <button type="submit" className="btn btn-primary" style={{alignSelf:'flex-start'}} disabled={formSending||formOk}>
-              {formOk ? '✓ ' + t.form.submitted : formSending ? '...' : t.form.submit + ' →'}
-            </button>
-          </form>
 
-          <div className="book-card">
-            <h3>{t.book.title}</h3>
-            <p>{t.book.desc}</p>
-            <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginBottom:16,letterSpacing:'0.06em'}}>{t.book.timezone}</div>
-            <div
-              className="calendly-inline-widget"
-              data-url="https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1a1f2e&text_color=f0f0ee&primary_color=c8f53a"
-              style={{minWidth:'100%',height:'520px'}}
-            />
+          {/* Left: Project enquiry form */}
+          <div>
+            <div style={{fontFamily:'var(--font-mono)',fontSize:11,letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--accent)',marginBottom:16}}>Option A — Send a message</div>
+            <form className="contact-form" onSubmit={submit}>
+              <div className="field-lbl">{t.form.name}</div>
+              <input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
+              <div className="field-lbl">{t.form.email}</div>
+              <input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
+              <div className="field-lbl">{t.form.company}</div>
+              <input value={form.company} onChange={e=>setForm({...form,company:e.target.value})} />
+              <div className="field-lbl">{t.form.budget}</div>
+              <select value={form.budget} onChange={e=>setForm({...form,budget:e.target.value})}>
+                {t.form.budgetOptions.map(o => <option key={o}>{o}</option>)}
+              </select>
+              <div className="field-lbl">{t.form.message}</div>
+              <textarea required placeholder={t.form.messagePh} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} />
+              <button type="submit" className="btn btn-primary" style={{alignSelf:'flex-start'}} disabled={formSending||formOk}>
+                {formOk ? '✓ ' + t.form.submitted : formSending ? '...' : t.form.submit + ' →'}
+              </button>
+            </form>
           </div>
+
+          {/* Right: Calendly with qualifier */}
+          <div className="book-card">
+            <div style={{fontFamily:'var(--font-mono)',fontSize:11,letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--accent)',marginBottom:16}}>Option B — Book a call</div>
+            <h3 style={{marginBottom:8}}>{t.book.title}</h3>
+            <p style={{marginBottom:16}}>{t.book.desc}</p>
+
+            {!qualDone ? (
+              <form onSubmit={unlockCalendly} style={{display:'flex',flexDirection:'column',gap:12}}>
+                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-dim)',letterSpacing:'0.06em',marginBottom:4}}>
+                  Tell me a bit about your project first — this helps me prepare for our call.
+                </div>
+                <div className="field-lbl">Your name</div>
+                <input required value={qual.name} onChange={e=>setQual({...qual,name:e.target.value})} placeholder="Jane Smith" style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:'var(--fg)',fontFamily:'var(--font-body)',fontSize:14,outline:'none'}} />
+                <div className="field-lbl">Your email</div>
+                <input type="email" required value={qual.email} onChange={e=>setQual({...qual,email:e.target.value})} placeholder="you@company.com" style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:'var(--fg)',fontFamily:'var(--font-body)',fontSize:14,outline:'none'}} />
+                <div className="field-lbl">Project type</div>
+                <select required value={qual.projectType} onChange={e=>setQual({...qual,projectType:e.target.value})} style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:qual.projectType?'var(--fg)':'var(--fg-faint)',fontFamily:'var(--font-body)',fontSize:14,outline:'none',appearance:'none'}}>
+                  <option value="">Select a project type...</option>
+                  {projectTypes.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <div className="field-lbl">Budget range</div>
+                <select required value={qual.budget} onChange={e=>setQual({...qual,budget:e.target.value})} style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',color:qual.budget?'var(--fg)':'var(--fg-faint)',fontFamily:'var(--font-body)',fontSize:14,outline:'none',appearance:'none'}}>
+                  <option value="">Select a budget range...</option>
+                  {budgets.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+                {qualErr && <div style={{color:'var(--danger)',fontSize:13,fontFamily:'var(--font-mono)'}}>Please fill in all fields to continue.</div>}
+                <button type="submit" className="btn btn-primary" style={{justifyContent:'center',marginTop:4}}>
+                  Show available slots →
+                </button>
+              </form>
+            ) : (
+              <>
+                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--accent)',marginBottom:20,letterSpacing:'0.06em'}}>✓ Thanks {qual.name} — pick a slot below</div>
+                <p style={{color:'var(--fg-dim)',fontSize:14,marginBottom:24,lineHeight:1.7}}>
+                  Click below to open the booking calendar. Choose a time that works for you — you'll get a confirmation email immediately.
+                </p>
+                <button
+                  className="btn btn-primary"
+                  style={{width:'100%',justifyContent:'center',fontSize:15,padding:'14px 20px'}}
+                  onClick={()=> window.Calendly && window.Calendly.initPopupWidget({url:'https://calendly.com/shami-wlsn/30min?hide_landing_page_details=1&hide_gdpr_banner=1'})}
+                >
+                  Open booking calendar →
+                </button>
+                <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--fg-faint)',marginTop:12,textAlign:'center',letterSpacing:'0.05em'}}>
+                  30 min · Phone call · Free · CET timezone
+                </div>
+              </>
+            )}
+          </div>
+
         </div>
       </div>
     </section>
@@ -292,14 +388,20 @@ function Footer({ t }) {
             {t.footer.cols.map((c,i) => (
               <div className="col" key={i}>
                 <h5>{c.h}</h5>
-                {c.links.map((l,j) => <a key={j} href="#">{l}</a>)}
+                {c.links.map((l,j) => {
+              const href = l === 'LinkedIn' ? 'https://www.linkedin.com/in/shami-wilson-540b94142/' :
+                           l === 'shami@wlsn.ch' ? 'mailto:shami@wlsn.ch' :
+                           l === 'Book a call' || l === 'Termin buchen' ? '#contact' :
+                           l === 'LinkedIn' ? 'https://www.linkedin.com/in/shami-wilson-540b94142/' : '#';
+              return <a key={j} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener">{l}</a>;
+            })}
               </div>
             ))}
           </div>
         </div>
         <div className="footer-bottom">
           <div>{t.footer.bottom}</div>
-          <div>v2.1 · last deploy today</div>
+          <div>v2.1 · deployed {new Date(document.lastModified).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
         </div>
       </div>
     </footer>
