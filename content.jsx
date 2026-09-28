@@ -6,7 +6,7 @@ const CONTENT = {
     ctaPrimary: "Start a project",
     ctaSecondary: "Book a call",
     hero: {
-      eyebrow: "AVAILABLE FOR NEW PROJECTS · Q3 2026",
+      eyebrow: "CURRENTLY NOT TAKING ON NEW PROJECTS",
       title1: "Software,",
       title2: "systems,",
       title3: "and ",
@@ -160,7 +160,7 @@ const CONTENT = {
     ctaPrimary: "Projekt starten",
     ctaSecondary: "Termin buchen",
     hero: {
-      eyebrow: "VERFÜGBAR FÜR NEUE PROJEKTE · Q3 2026",
+      eyebrow: "AKTUELL KEINE NEUEN PROJEKTE",
       sub: "Unabhängiger IT-Berater aus Zürich. Ich baue Web-Tools, Dashboards, Automatisierungen und KI-Integrationen — und kenne mich mit Compliance-Infrastruktur aus dem Bankensektor aus. Eine Person, durchgängig, ohne Agenturaufschlag.",
     },
     heroSub: "Unabhängiger IT-Berater aus Zürich. Ich baue Web-Tools, Dashboards, Automatisierungen und KI-Integrationen — und kenne mich mit Compliance-Infrastruktur aus dem Bankensektor aus. Eine Person, durchgängig, ohne Agenturaufschlag.",
