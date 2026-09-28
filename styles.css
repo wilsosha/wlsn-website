@@ -116,7 +116,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px;
   background: var(--bg-elev);
 }
-.hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
+.hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: #888884; box-shadow: none; animation: none; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 .hero h1 {
